@@ -62,10 +62,10 @@ class MadMimi
 
   def initialize(username, api_key, options = {})
     @api_settings = options.reverse_merge({
-      :verify_ssl => true
+      verify_ssl: true
     }).merge({
-      :username   => username,
-      :api_key    => api_key
+      username:   username,
+      api_key:    api_key
     })
   end
 
@@ -96,26 +96,26 @@ class MadMimi
   # Audience and lists
   def lists
     wrap_with_array('lists', 'list') do
-      do_request(path(:audience_lists), :get, :format => :xml)
+      do_request(path(:audience_lists), :get, format: :xml)
     end
   end
 
   def memberships(email)
     wrap_with_array('lists', 'list') do
-      do_request(path(:memberships, :email => email), :get)
+      do_request(path(:memberships, email: email), :get)
     end
   end
 
   def new_list(list_name)
-    do_request(path(:create_list), :post, :name => list_name)
+    do_request(path(:create_list), :post, name: list_name)
   end
 
   def delete_list(list_name)
-    do_request(path(:destroy_list, :list => list_name), :delete)
+    do_request(path(:destroy_list, list: list_name), :delete)
   end
 
   def csv_import(csv_string)
-    do_request(path(:audience_members), :post, :csv_file => csv_string)
+    do_request(path(:audience_members), :post, csv_file: csv_string)
   end
 
   def add_user(hash_or_array)
@@ -125,19 +125,19 @@ class MadMimi
   alias :add_users :add_user
 
   def add_to_list(email, list_name, options={})
-    do_request(path(:add_to_list, :list => list_name), :post, options.merge(:email => email))
+    do_request(path(:add_to_list, list: list_name), :post, options.merge(email: email))
   end
 
   def remove_from_list(email, list_name)
-    do_request(path(:remove_from_list, :list => list_name), :post, :email => email)
+    do_request(path(:remove_from_list, list: list_name), :post, email: email)
   end
 
   def remove_from_all_lists(email)
-    do_request(path(:remove_from_all_lists), :post, :email => email)
+    do_request(path(:remove_from_all_lists), :post, email: email)
   end
 
   def update_email(existing_email, new_email)
-    do_request(path(:update_user_email, :email => existing_email), :post, :email => existing_email, :new_email => new_email)
+    do_request(path(:update_user_email, email: existing_email), :post, email: existing_email, new_email: new_email)
   end
 
   def members
@@ -148,24 +148,24 @@ class MadMimi
 
   def list_members(list_name, page = 1, per_page = 30)
     wrap_with_array('audience', 'member') do
-      do_request(path(:audience_list_members, :list => list_name), :get, {
-        :page     => page,
-        :per_page => per_page
+      do_request(path(:audience_list_members, list: list_name), :get, {
+        page:       page,
+        per_page: per_page
       })
     end
   end
 
   def list_size(list_name)
-      do_request(path(:audience_list_size, :list => list_name), :get)
+      do_request(path(:audience_list_size, list: list_name), :get)
   end
 
   def list_size_since(list_name, date)
-    do_request(path(:audience_list_size, :list => list_name, :date => date), :get)
+    do_request(path(:audience_list_size, list: list_name, date: date), :get)
   end
 
   def suppressed_since(timestamp, show_suppression_reason = false)
-    do_request(path(:suppressed_since, :timestamp => timestamp), :get, {
-      :show_suppression_reason => show_suppression_reason
+    do_request(path(:suppressed_since, timestamp: timestamp), :get, {
+      show_suppression_reason: show_suppression_reason
     })
   end
 
@@ -173,7 +173,7 @@ class MadMimi
     return '' if suppressed?(email)
 
     process_json_response do
-      do_request(path(:suppress_user), :post, :audience_member_id => email, :format => :json)
+      do_request(path(:suppress_user), :post, audience_member_id: email, format: :json)
     end
   end
 
@@ -181,17 +181,17 @@ class MadMimi
     return '' unless suppressed?(email)
 
     process_json_response do
-      do_request(path(:unsuppress_user, :email => email), :delete, :format => :json)
+      do_request(path(:unsuppress_user, email: email), :delete, format: :json)
     end
   end
 
   def suppressed?(email)
-    response = do_request(path(:is_suppressed, :email => email), :get)
+    response = do_request(path(:is_suppressed, email: email), :get)
     response == 'true'
   end
 
   def audience_search(query_string, raw = false)
-    do_request(path(:search), :get, :raw => raw, :query => query_string)
+    do_request(path(:search), :get, raw: raw, query: query_string)
   end
 
   def add_users_to_list(list_name, arr)
@@ -206,7 +206,7 @@ class MadMimi
   end
 
   def save_promotion(promotion_name, raw_html, plain_text = nil)
-    options = { :promotion_name => promotion_name }
+    options = { promotion_name: promotion_name }
 
     unless raw_html.nil?
       check_for_tracking_beacon raw_html
@@ -224,7 +224,7 @@ class MadMimi
 
   # Stats
   def mailing_stats(promotion_id, mailing_id)
-    do_request(path(:mailing_stats, :promotion_id => promotion_id, :mailing_id => mailing_id), :get)
+    do_request(path(:mailing_stats, promotion_id: promotion_id, mailing_id: mailing_id), :get)
   end
 
   # Mailer API
@@ -270,7 +270,7 @@ class MadMimi
   end
 
   def status(transaction_id)
-    do_request(path(:mailer_status, :transaction_id => transaction_id), :get, {}, true)
+    do_request(path(:mailer_status, transaction_id: transaction_id), :get, {}, true)
   end
 
   private
@@ -278,8 +278,8 @@ class MadMimi
   # Refactor this method asap
   def do_request(path, method = :get, options = {}, transactional = false)
     options = default_options.deep_merge({
-      :format => options.delete(:format) || extract_format(path),
-      :body => options
+      format: options.delete(:format) || extract_format(path),
+      body: options
     })
 
     path = convert_to_secure(path) if transactional
@@ -337,11 +337,11 @@ class MadMimi
 
   def default_options
     {
-      :body => {
-        :username => username,
-        :api_key  => api_key
+      body: {
+        username: username,
+        api_key:  api_key
       },
-      :verify => verify_ssl?
+      verify: verify_ssl?
     }
   end
 
