@@ -8,7 +8,7 @@ The power of Mad Mimi in your Ruby application. Deliver emails, track statistics
 
 or if you prefer to live on the edge, just clone this repository and build it from scratch.
 
-== compatibility
+== Compatibility
 
 * ruby 1.9+
 * ruby 2.0+
