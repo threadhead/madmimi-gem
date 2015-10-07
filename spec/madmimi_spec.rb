@@ -427,9 +427,9 @@ describe MadMimi do
 
     context 'when user has memberships', :vcr => { :cassette_name => 'remove_from_all_lists/user_with_memberships' } do
       it "removes user from all lists" do
-        VCR.use_cassette('remove_from_all_lists/user_has_memberships') do
-          expect(mad_mimi.memberships('test@example.com')['lists']['list']).not_to be_empty
-        end
+        # VCR.use_cassette('remove_from_all_lists/user_has_memberships') do
+        #   expect(mad_mimi.memberships('test@example.com')['lists']['list']).not_to be_empty
+        # end
 
         subject
 
@@ -536,8 +536,8 @@ describe MadMimi do
 
   context '#list_size' do
     subject { mad_mimi.list_size('list 1') }
-    
-    context 'when list exists', :vcr => { :cassette_name => 'list_size/list_exists' } do  
+
+    context 'when list exists', :vcr => { :cassette_name => 'list_size/list_exists' } do
 
       it 'returns an success message' do
         expect(subject).to be_truthy

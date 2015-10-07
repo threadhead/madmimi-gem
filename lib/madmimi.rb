@@ -33,7 +33,7 @@ require 'rubygems'
 require 'httparty'
 require 'csv'
 require 'yaml'
-require 'crack'
+require 'json'
 
 class MadMimi
 
@@ -48,13 +48,13 @@ class MadMimi
       begin
         case format
         when :json
-          Crack::JSON.parse(body)
+          JSON.parse(body)
         when :xml
-          Crack::XML.parse(body)
+          body.strip.empty? ? {} : Hash.from_xml(body.delete("\n"))
         else
           body
         end
-      rescue Crack::ParseError, REXML::ParseException
+      rescue JSON::ParserError, REXML::ParseException
         body
       end
     end
